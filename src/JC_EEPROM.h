@@ -79,18 +79,22 @@ class JC_EEPROM
         };
 
         // I2C clock frequencies
-        enum twiClockFreq_t { twiClock100kHz = 100000, twiClock400kHz = 400000 };
+        enum twiClockFreq_t
+            { twiClock100kHz = 100000, twiClock400kHz = 400000 };
 
         // EEPROM addressing error, returned by write() or read() if
         // upper address bound is exceeded
         static const uint8_t EEPROM_ADDR_ERR {9};
 
-        JC_EEPROM(eeprom_size_t deviceCapacity, byte nDevice, unsigned int pageSize, byte eepromAddr = 0x50);
+        JC_EEPROM(eeprom_size_t deviceCapacity, byte nDevice,
+            unsigned int pageSize, byte eepromAddr = 0x50);
         byte begin(twiClockFreq_t twiFreq = twiClock100kHz);
         byte write(unsigned long addr, byte* values, unsigned int nBytes);
         byte write(unsigned long addr, byte value);
         byte read(unsigned long addr, byte* values, unsigned int nBytes);
         int read(unsigned long addr);
+        byte update(unsigned long addr, byte value)
+            {return (read(addr) == value) ? 0 : write(addr, &value, 1); }
 
     private:
         uint8_t _eepromAddr;            // eeprom i2c address
