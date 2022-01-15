@@ -87,9 +87,9 @@ class JC_EEPROM
 
         JC_EEPROM(eeprom_size_t deviceCapacity, byte nDevice, unsigned int pageSize, byte eepromAddr = 0x50);
         byte begin(twiClockFreq_t twiFreq = twiClock100kHz);
-        byte write(unsigned long addr, byte *values, unsigned int nBytes);
+        byte write(unsigned long addr, byte* values, unsigned int nBytes);
         byte write(unsigned long addr, byte value);
-        byte read(unsigned long addr, byte *values, unsigned int nBytes);
+        byte read(unsigned long addr, byte* values, unsigned int nBytes);
         int read(unsigned long addr);
 
     private:
