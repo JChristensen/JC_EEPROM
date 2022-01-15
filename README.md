@@ -1,4 +1,4 @@
-+++++# Arduino EEPROM Library
+# Arduino EEPROM Library
 http://github.com/JChristensen/JC_EEPROM  
 README file  
 
