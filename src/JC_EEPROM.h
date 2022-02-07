@@ -92,14 +92,14 @@ class JC_EEPROM
         // upper address bound is exceeded
         static const uint8_t EEPROM_ADDR_ERR {9};
 
-        JC_EEPROM(eeprom_size_t deviceCapacity, byte nDevice,
-            unsigned int pageSize, byte eepromAddr = 0x50);
-        byte begin(twiClockFreq_t twiFreq = twiClock100kHz);
-        byte write(unsigned long addr, byte* values, unsigned int nBytes);
-        byte write(unsigned long addr, byte value);
-        byte read(unsigned long addr, byte* values, unsigned int nBytes);
-        int read(unsigned long addr);
-        byte update(unsigned long addr, byte value)
+        JC_EEPROM(eeprom_size_t deviceCapacity, uint8_t nDevice,
+            uint16_t pageSize, uint8_t eepromAddr = 0x50);
+        uint8_t begin(twiClockFreq_t twiFreq = twiClock100kHz);
+        uint8_t write(uint32_t addr, uint8_t* values, uint16_t nBytes);
+        uint8_t write(uint32_t addr, uint8_t value);
+        uint8_t read(uint32_t addr, uint8_t* values, uint16_t nBytes);
+        int16_t read(uint32_t addr);
+        uint8_t update(uint32_t addr, uint8_t value)
             {return (read(addr) == value) ? 0 : write(addr, &value, 1); }
 
     private:
@@ -109,7 +109,7 @@ class JC_EEPROM
         uint16_t _pageSize;             // page size in bytes
         uint8_t _csShift;               // number of bits to shift address for chip select bits in control byte
         uint16_t _nAddrBytes;           // number of address bytes (1 or 2)
-        unsigned long _totalCapacity;   // capacity of all EEPROM devices on the bus, in bytes
+        uint32_t _totalCapacity;        // capacity of all EEPROM devices on the bus, in bytes
 };
 
 #endif

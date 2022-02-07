@@ -17,7 +17,7 @@
 //   be identical).
 // - pageSize is the EEPROM's page size in bytes.
 // - eepromAddr is the EEPROM's I2C address and defaults to 0x50 which is common.
-JC_EEPROM::JC_EEPROM(eeprom_size_t deviceCapacity, byte nDevice, unsigned int pageSize, uint8_t eepromAddr)
+JC_EEPROM::JC_EEPROM(eeprom_size_t deviceCapacity, uint8_t nDevice, uint16_t pageSize, uint8_t eepromAddr)
 {
     _dvcCapacity = deviceCapacity;
     _nDevice = nDevice;
@@ -46,7 +46,7 @@ JC_EEPROM::JC_EEPROM(eeprom_size_t deviceCapacity, byte nDevice, unsigned int pa
 // when using a 400kHz bus speed and there are multiple I2C devices on the
 // bus (other than EEPROM), call extEEPROM::begin() after any initialization
 // calls for the other devices to ensure the intended I2C clock speed is set.
-byte JC_EEPROM::begin(twiClockFreq_t twiFreq)
+uint8_t JC_EEPROM::begin(twiClockFreq_t twiFreq)
 {
     Wire.begin();
     Wire.setClock(twiFreq);
@@ -60,7 +60,7 @@ byte JC_EEPROM::begin(twiClockFreq_t twiFreq)
 // If the I/O would extend past the top of the EEPROM address space,
 // a status of EEPROM_ADDR_ERR is returned. For I2C errors, the status
 // from the Arduino Wire library is passed back through to the caller.
-byte JC_EEPROM::write(unsigned long addr, byte* values, unsigned int nBytes)
+uint8_t JC_EEPROM::write(uint32_t addr, uint8_t* values, uint16_t nBytes)
 {
     uint8_t ctrlByte;       // control byte (I2C device address & chip/block select bits)
     uint8_t txStatus = 0;   // transmit status
@@ -106,10 +106,10 @@ byte JC_EEPROM::write(unsigned long addr, byte* values, unsigned int nBytes)
 // If the I/O would extend past the top of the EEPROM address space,
 // a status of EEPROM_ADDR_ERR is returned. For I2C errors, the status
 // from the Arduino Wire library is passed back through to the caller.
-byte JC_EEPROM::read(unsigned long addr, byte* values, unsigned int nBytes)
+uint8_t JC_EEPROM::read(uint32_t addr, uint8_t* values, uint16_t nBytes)
 {
-    byte ctrlByte;
-    byte rxStatus;
+    uint8_t ctrlByte;
+    uint8_t rxStatus;
     uint16_t nRead;     // number of bytes to read
     uint16_t nPage;     // number of bytes remaining on current page, starting at addr
 
@@ -142,7 +142,7 @@ byte JC_EEPROM::read(unsigned long addr, byte* values, unsigned int nBytes)
 // If the I/O would extend past the top of the EEPROM address space,
 // a status of EEPROM_ADDR_ERR is returned. For I2C errors, the status
 // from the Arduino Wire library is passed back through to the caller.
-byte JC_EEPROM::write(unsigned long addr, byte value)
+uint8_t JC_EEPROM::write(uint32_t addr, uint8_t value)
 {
     return write(addr, &value, 1);
 }
@@ -152,11 +152,10 @@ byte JC_EEPROM::write(unsigned long addr, byte value)
 // a status of EEPROM_ADDR_ERR is returned. For I2C errors, the status
 // from the Arduino Wire library is passed back through to the caller.
 // To distinguish error values from valid data, error values are returned as negative numbers.
-int JC_EEPROM::read(unsigned long addr)
+int16_t JC_EEPROM::read(uint32_t addr)
 {
     uint8_t data;
-    int ret;
 
-    ret = read(addr, &data, 1);
+    int16_t ret = read(addr, &data, 1);
     return ret == 0 ? data : -ret;
 }
