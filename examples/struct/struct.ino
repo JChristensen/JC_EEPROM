@@ -9,11 +9,11 @@
 #include <Streaming.h>      // https://github.com/janelia-arduino/Streaming
 
 struct myStruct {
-    int       a;
-    long      b;
+    int16_t   a;
+    int32_t   b;
     float     c;
     double    d;
-    byte      e;
+    uint8_t   e;
     bool      f;
 };
 
@@ -27,12 +27,12 @@ void setup()
 
     Serial << "Writing\n";
     myStruct w { 1, 2, 3, 4, 5, true };
-    eep.write(0, reinterpret_cast<byte*>(&w), sizeof(w));
+    eep.write(0, reinterpret_cast<uint8_t*>(&w), sizeof(w));
     printStruct(w);
 
     Serial << "Reading\n";
     myStruct r;
-    eep.read(0, reinterpret_cast<byte*>(&r), sizeof(r));
+    eep.read(0, reinterpret_cast<uint8_t*>(&r), sizeof(r));
     printStruct(r);
 }
 

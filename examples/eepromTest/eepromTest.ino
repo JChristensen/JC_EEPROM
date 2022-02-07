@@ -101,7 +101,7 @@ void eeErase(uint8_t chunk, uint32_t startAddr, uint32_t endAddr)
     chunk &= 0xFC;          // force chunk to be a multiple of 4
     uint8_t data[chunk];
     Serial << F("Erasing...") << endl;
-    for (int i = 0; i < chunk; i++) data[i] = 0xFF;
+    for (int16_t i = 0; i < chunk; i++) data[i] = 0xFF;
     uint32_t msStart = millis();
     
     for (uint32_t a = startAddr; a <= endAddr; a += chunk) {
@@ -128,7 +128,7 @@ void dump(uint32_t startAddr, uint32_t nBytes)
         if ( a < 16 * 16 ) Serial << '0';
         if ( a < 16 ) Serial << '0';
         Serial << _HEX(a) << ' ';
-        for ( int c = 0; c < 16; c++ ) {
+        for ( int16_t c = 0; c < 16; c++ ) {
             if ( d[c] < 16 ) Serial << '0';
             Serial << _HEX( d[c] ) << ( c == 7 ? "  " : " " );
         }
