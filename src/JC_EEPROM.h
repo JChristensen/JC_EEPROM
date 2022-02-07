@@ -59,6 +59,12 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+// a horrible and limiting kludge for architectures that
+// do not define BUFFER_LENGTH
+#ifndef BUFFER_LENGTH
+#define BUFFER_LENGTH 32
+#endif
+
 class JC_EEPROM
 {
     public:
