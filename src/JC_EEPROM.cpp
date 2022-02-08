@@ -62,21 +62,17 @@ uint8_t JC_EEPROM::begin(twiClockFreq_t twiFreq)
 // from the Arduino Wire library is passed back through to the caller.
 uint8_t JC_EEPROM::write(uint32_t addr, uint8_t* values, uint16_t nBytes)
 {
-    uint8_t ctrlByte;       // control byte (I2C device address & chip/block select bits)
-    uint8_t txStatus {0};   // transmit status
-    uint16_t nWrite;        // number of bytes to write
-    uint16_t nPage;         // number of bytes remaining on current page, starting at addr
-
     if (addr + nBytes > m_totalCapacity) {  // will this write go past the top of the EEPROM?
         return EEPROM_ADDR_ERR;             // yes, tell the caller
     }
 
+    uint8_t txStatus {0};   // transmit status
     while (nBytes > 0) {
-        nPage = m_pageSize - ( addr & (m_pageSize - 1) );
+        uint16_t nPage = m_pageSize - ( addr & (m_pageSize - 1) );
         // find min(nBytes, nPage, BUFFER_LENGTH) -- BUFFER_LENGTH is defined in the Wire library.
-        nWrite = nBytes < nPage ? nBytes : nPage;
+        uint16_t nWrite = nBytes < nPage ? nBytes : nPage;
         nWrite = BUFFER_LENGTH - m_nAddrBytes < nWrite ? BUFFER_LENGTH - m_nAddrBytes : nWrite;
-        ctrlByte = m_eepromAddr | static_cast<uint8_t>(addr >> m_csShift);
+        uint8_t ctrlByte = m_eepromAddr | static_cast<uint8_t>(addr >> m_csShift);
         Wire.beginTransmission(ctrlByte);
         if (m_nAddrBytes == 2) Wire.write(static_cast<uint8_t>(addr >> 8)); // high addr byte
         Wire.write(static_cast<uint8_t>(addr));                             // low addr byte
@@ -108,24 +104,19 @@ uint8_t JC_EEPROM::write(uint32_t addr, uint8_t* values, uint16_t nBytes)
 // from the Arduino Wire library is passed back through to the caller.
 uint8_t JC_EEPROM::read(uint32_t addr, uint8_t* values, uint16_t nBytes)
 {
-    uint8_t ctrlByte;
-    uint8_t rxStatus;
-    uint16_t nRead;     // number of bytes to read
-    uint16_t nPage;     // number of bytes remaining on current page, starting at addr
-
     if (addr + nBytes > m_totalCapacity) {  // will this read take us past the top of the EEPROM?
         return EEPROM_ADDR_ERR;             // yes, tell the caller
     }
 
     while (nBytes > 0) {
-        nPage = m_pageSize - ( addr & (m_pageSize - 1) );
-        nRead = nBytes < nPage ? nBytes : nPage;
+        uint16_t nPage = m_pageSize - ( addr & (m_pageSize - 1) );
+        uint16_t nRead = nBytes < nPage ? nBytes : nPage;
         nRead = BUFFER_LENGTH < nRead ? BUFFER_LENGTH : nRead;
-        ctrlByte = m_eepromAddr | static_cast<uint8_t>(addr >> m_csShift);
+        uint8_t ctrlByte = m_eepromAddr | static_cast<uint8_t>(addr >> m_csShift);
         Wire.beginTransmission(ctrlByte);
         if (m_nAddrBytes == 2) Wire.write(static_cast<uint8_t>(addr >> 8)); // high addr byte
         Wire.write(static_cast<uint8_t>(addr));                             // low addr byte
-        rxStatus = Wire.endTransmission();
+        uint8_t rxStatus = Wire.endTransmission();
         if (rxStatus != 0) return rxStatus;     // read error
 
         Wire.requestFrom(ctrlByte, nRead);
