@@ -103,11 +103,11 @@ class JC_EEPROM
             {return (read(addr) == value) ? 0 : write(addr, &value, 1); }
 
     private:
-        uint8_t m_eepromAddr;           // eeprom i2c address
+        uint8_t  m_eepromAddr;          // eeprom i2c address
         uint16_t m_dvcCapacity;         // capacity of one EEPROM device, in kbits
-        uint8_t m_nDevice;              // number of devices on the bus
+        uint8_t  m_nDevice;             // number of devices on the bus
         uint16_t m_pageSize;            // page size in bytes
-        uint8_t m_csShift;              // number of bits to shift address for chip select bits in control byte
+        uint8_t  m_csShift;             // number of bits to shift address for chip select bits in control byte
         uint16_t m_nAddrBytes;          // number of address bytes (1 or 2)
         uint32_t m_totalCapacity;       // capacity of all EEPROM devices on the bus, in bytes
 };

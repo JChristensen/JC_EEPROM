@@ -16,6 +16,8 @@
 // Two 24LC256 EEPROMs on the bus
 JC_EEPROM eep(JC_EEPROM::kbits_256, 2, 64); // device size, number of devices, page size
 
+constexpr bool erase {false};               // true writes 0xFF to all addresses,
+                                            //   false performs write/read test
 constexpr uint32_t totalKBytes {64};        // for read and write test functions
 constexpr uint8_t btnStart {6};             // pin for start button
 
@@ -30,24 +32,27 @@ void setup()
         Serial << endl << F("extEEPROM.begin() failed, status = ") << eepStatus << endl;
         while (1);
     }
-    
+
     Serial << endl << F("Press button to start...") << endl;
     while (digitalRead(btnStart) == HIGH) delay(10);    // wait for button push
 
     // chunkSize can be changed, but must be a multiple of 4 since we're writing 32-bit integers
-    uint8_t chunkSize = 64;    
-    //eeErase(chunkSize, 0, totalKBytes * 1024 - 1);
-    eeWrite(chunkSize);
-    eeRead(chunkSize);
-
-    dump(0, 16);        // the first 16 bytes
-    dump(32752, 32);    // across the device boundary
-    dump(65520, 16);    // the last 16 bytes
+    uint8_t chunkSize = 64;
+    if (erase) {
+        eeErase(chunkSize, 0, totalKBytes * 1024 - 1);
+        dump(0, totalKBytes * 1024);    // dump everything
+    }
+    else {
+        eeWrite(chunkSize);
+        eeRead(chunkSize);
+        dump(0, 16);        // the first 16 bytes
+        dump(32752, 32);    // across the device boundary
+        dump(65520, 16);    // the last 16 bytes
+    }
+    Serial << "\nDone.\n";
 }
 
-void loop()
-{
-}
+void loop() {}
 
 // write test data (32-bit integers) to eeprom, "chunk" bytes at a time
 void eeWrite(uint8_t chunk)
@@ -57,7 +62,7 @@ void eeWrite(uint8_t chunk)
     uint32_t val = 0;
     Serial << F("Writing...") << endl;
     uint32_t msStart = millis();
-    
+
     for (uint32_t addr = 0; addr < totalKBytes * 1024; addr += chunk) {
         if ( (addr &0xFFF) == 0 ) Serial << addr << endl;
         for (uint8_t c = 0; c < chunk; c += 4) {
@@ -81,7 +86,7 @@ void eeRead(uint8_t chunk)
     uint32_t val = 0, testVal;
     Serial << F("Reading...") << endl;
     uint32_t msStart = millis();
-    
+
     for (uint32_t addr = 0; addr < totalKBytes * 1024; addr += chunk) {
         if ( (addr &0xFFF) == 0 ) Serial << addr << endl;
         eep.read(addr, data, chunk);
@@ -103,7 +108,7 @@ void eeErase(uint8_t chunk, uint32_t startAddr, uint32_t endAddr)
     Serial << F("Erasing...") << endl;
     for (int16_t i = 0; i < chunk; i++) data[i] = 0xFF;
     uint32_t msStart = millis();
-    
+
     for (uint32_t a = startAddr; a <= endAddr; a += chunk) {
         if ( (a &0xFFF) == 0 ) Serial << a << endl;
         eep.write(a, data, chunk);
@@ -114,24 +119,36 @@ void eeErase(uint8_t chunk, uint32_t startAddr, uint32_t endAddr)
 
 // dump eeprom contents, 16 bytes at a time.
 // always dumps a multiple of 16 bytes.
+// duplicate rows are suppressed and indicated with an asterisk.
 void dump(uint32_t startAddr, uint32_t nBytes)
 {
     Serial << endl << F("EEPROM DUMP 0x") << _HEX(startAddr) << F(" 0x") << _HEX(nBytes) << ' ' << startAddr << ' ' << nBytes << endl;
     uint32_t nRows = (nBytes + 15) >> 4;
 
-    uint8_t d[16];
+    uint8_t d[16], last[16];
+    uint32_t aLast {startAddr};
     for (uint32_t r = 0; r < nRows; r++) {
         uint32_t a = startAddr + 16 * r;
         eep.read(a, d, 16);
-        Serial << "0x";
-        if ( a < 16 * 16 * 16 ) Serial << '0';
-        if ( a < 16 * 16 ) Serial << '0';
-        if ( a < 16 ) Serial << '0';
-        Serial << _HEX(a) << ' ';
-        for ( int16_t c = 0; c < 16; c++ ) {
-            if ( d[c] < 16 ) Serial << '0';
-            Serial << _HEX( d[c] ) << ( c == 7 ? "  " : " " );
+        bool same {true};
+        for (int i=0; i<16; ++i) {
+            if (last[i] != d[i]) same = false;
         }
-        Serial << endl;
+        if (!same || r == 0 || r == nRows-1) {
+            Serial << "0x";
+            if ( a < 16 * 16 * 16 ) Serial << '0';
+            if ( a < 16 * 16 ) Serial << '0';
+            if ( a < 16 ) Serial << '0';
+            Serial << _HEX(a) << (a == aLast+16 || r == 0 ? "  " : "* ");
+            for ( int16_t c = 0; c < 16; c++ ) {
+                if ( d[c] < 16 ) Serial << '0';
+                Serial << _HEX( d[c] ) << ( c == 7 ? "  " : " " );
+            }
+            Serial << endl;
+            aLast = a;
+        }
+        for (int i=0; i<16; ++i) {
+            last[i] = d[i];
+        }
     }
 }
