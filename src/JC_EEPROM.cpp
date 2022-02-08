@@ -19,23 +19,23 @@
 // - eepromAddr is the EEPROM's I2C address and defaults to 0x50 which is common.
 JC_EEPROM::JC_EEPROM(eeprom_size_t deviceCapacity, uint8_t nDevice, uint16_t pageSize, uint8_t eepromAddr)
 {
-    _dvcCapacity = deviceCapacity;
-    _nDevice = nDevice;
-    _pageSize = pageSize;
-    _eepromAddr = eepromAddr;
-    _totalCapacity = _nDevice * _dvcCapacity * 1024UL / 8;
-    _nAddrBytes = deviceCapacity > kbits_16 ? 2 : 1;    // two address bytes needed for eeproms > 16kbits
+    m_dvcCapacity = deviceCapacity;
+    m_nDevice = nDevice;
+    m_pageSize = pageSize;
+    m_eepromAddr = eepromAddr;
+    m_totalCapacity = m_nDevice * m_dvcCapacity * 1024UL / 8;
+    m_nAddrBytes = deviceCapacity > kbits_16 ? 2 : 1;   // two address bytes needed for eeproms > 16kbits
 
     // determine the bitshift needed to isolate the chip select bits from
     // the address to put into the control byte
-    uint16_t kb = _dvcCapacity;
-    if ( kb <= kbits_16 ) _csShift = 8;
-    else if ( kb >= kbits_512 ) _csShift = 16;
+    uint16_t kb = m_dvcCapacity;
+    if ( kb <= kbits_16 ) m_csShift = 8;
+    else if ( kb >= kbits_512 ) m_csShift = 16;
     else {
         kb >>= 6;
-        _csShift = 12;
+        m_csShift = 12;
         while ( kb >= 1 ) {
-            ++_csShift;
+            ++m_csShift;
             kb >>= 1;
         }
     }
@@ -50,8 +50,8 @@ uint8_t JC_EEPROM::begin(twiClockFreq_t twiFreq)
 {
     Wire.begin();
     Wire.setClock(twiFreq);
-    Wire.beginTransmission(_eepromAddr);
-    if (_nAddrBytes == 2) Wire.write(0);    // high addr byte
+    Wire.beginTransmission(m_eepromAddr);
+    if (m_nAddrBytes == 2) Wire.write(0);   // high addr byte
     Wire.write(0);                          // low addr byte
     return Wire.endTransmission();
 }
@@ -63,23 +63,23 @@ uint8_t JC_EEPROM::begin(twiClockFreq_t twiFreq)
 uint8_t JC_EEPROM::write(uint32_t addr, uint8_t* values, uint16_t nBytes)
 {
     uint8_t ctrlByte;       // control byte (I2C device address & chip/block select bits)
-    uint8_t txStatus = 0;   // transmit status
+    uint8_t txStatus {0};   // transmit status
     uint16_t nWrite;        // number of bytes to write
     uint16_t nPage;         // number of bytes remaining on current page, starting at addr
 
-    if (addr + nBytes > _totalCapacity) {   // will this write go past the top of the EEPROM?
+    if (addr + nBytes > m_totalCapacity) {  // will this write go past the top of the EEPROM?
         return EEPROM_ADDR_ERR;             // yes, tell the caller
     }
 
     while (nBytes > 0) {
-        nPage = _pageSize - ( addr & (_pageSize - 1) );
+        nPage = m_pageSize - ( addr & (m_pageSize - 1) );
         // find min(nBytes, nPage, BUFFER_LENGTH) -- BUFFER_LENGTH is defined in the Wire library.
         nWrite = nBytes < nPage ? nBytes : nPage;
-        nWrite = BUFFER_LENGTH - _nAddrBytes < nWrite ? BUFFER_LENGTH - _nAddrBytes : nWrite;
-        ctrlByte = _eepromAddr | (byte) (addr >> _csShift);
+        nWrite = BUFFER_LENGTH - m_nAddrBytes < nWrite ? BUFFER_LENGTH - m_nAddrBytes : nWrite;
+        ctrlByte = m_eepromAddr | (byte) (addr >> m_csShift);
         Wire.beginTransmission(ctrlByte);
-        if (_nAddrBytes == 2) Wire.write( (byte) (addr >> 8) ); // high addr byte
-        Wire.write( (byte) addr );                              //low addr byte
+        if (m_nAddrBytes == 2) Wire.write( (byte) (addr >> 8) );    // high addr byte
+        Wire.write( (byte) addr );                                  // low addr byte
         Wire.write(values, nWrite);
         txStatus = Wire.endTransmission();
         if (txStatus != 0) return txStatus;
@@ -88,7 +88,7 @@ uint8_t JC_EEPROM::write(uint32_t addr, uint8_t* values, uint16_t nBytes)
         for (uint8_t i=100; i; --i) {
             delayMicroseconds(500);                 // no point in waiting too fast
             Wire.beginTransmission(ctrlByte);
-            if (_nAddrBytes == 2) Wire.write(0);    // high addr byte
+            if (m_nAddrBytes == 2) Wire.write(0);   // high addr byte
             Wire.write(0);                          // low addr byte
             txStatus = Wire.endTransmission();
             if (txStatus == 0) break;
@@ -113,18 +113,18 @@ uint8_t JC_EEPROM::read(uint32_t addr, uint8_t* values, uint16_t nBytes)
     uint16_t nRead;     // number of bytes to read
     uint16_t nPage;     // number of bytes remaining on current page, starting at addr
 
-    if (addr + nBytes > _totalCapacity) {   // will this read take us past the top of the EEPROM?
+    if (addr + nBytes > m_totalCapacity) {  // will this read take us past the top of the EEPROM?
         return EEPROM_ADDR_ERR;             // yes, tell the caller
     }
 
     while (nBytes > 0) {
-        nPage = _pageSize - ( addr & (_pageSize - 1) );
+        nPage = m_pageSize - ( addr & (m_pageSize - 1) );
         nRead = nBytes < nPage ? nBytes : nPage;
         nRead = BUFFER_LENGTH < nRead ? BUFFER_LENGTH : nRead;
-        ctrlByte = _eepromAddr | (byte) (addr >> _csShift);
+        ctrlByte = m_eepromAddr | (byte) (addr >> m_csShift);
         Wire.beginTransmission(ctrlByte);
-        if (_nAddrBytes == 2) Wire.write( (byte) (addr >> 8) ); // high addr byte
-        Wire.write( (byte) addr );                              // low addr byte
+        if (m_nAddrBytes == 2) Wire.write( (byte) (addr >> 8) );    // high addr byte
+        Wire.write( (byte) addr );                                  // low addr byte
         rxStatus = Wire.endTransmission();
         if (rxStatus != 0) return rxStatus;     // read error
 
