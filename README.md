@@ -48,6 +48,7 @@ The library can be installed using the Arduino Library Manager. To install manua
 ## Examples
 The following example sketch is included with the **JC_EEPROM Library**:
 - **eepromTest:** Writes 32-bit integers to the entire EEPROM address space, starting at address 0 and continuing to the topmost address. These are then read back in and verified; any discrepancies are reported to the serial monitor.
+- **struct:** Demonstrates writing a `struct` to EEPROM and reading it back.
 
 ## Enumerations
 
