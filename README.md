@@ -102,7 +102,7 @@ Initializes the library. Call this method once in the setup code. begin() does a
 ##### Parameters
 **freq** *(twiClockFreq_t)*: The desired I2C bus speed, `JC_EEPROM::twiClock100kHz` or `JC_EEPROM::twiClock400kHz`. Can be omitted in which case it will default to `twiClock100kHz`. **NOTE:** When using 400kHz, if there are other devices on the bus they must all support a 400kHz bus speed. **Secondly**, the other devices should be initialized first, as other libraries may not support adjusting the bus speed. To ensure the desired speed is set, call the JC_EEPROM.begin() function *after* initializing all other I2C devices.
 ##### Returns
-I2C I/O status, zero if successful *(uint8_t)*. See the [Arduino Wire.endTransmission() function](http://arduino.cc/en/Reference/WireEndTransmission) for a description of other return codes.
+I2C I/O status, zero if successful *(uint8_t)*. See the [Arduino Wire.endTransmission() function](https://www.arduino.cc/reference/en/language/functions/communication/wire/endtransmission/) for a description of other return codes.
 ##### Example
 ```c++
 JC_EEPROM myEEPROM(kbits_256, 2, 64);
@@ -121,7 +121,7 @@ Write one or more bytes to external EEPROM.
 **values** _(uint8_t*)_: Pointer to an array containing the data to write.  
 **nBytes** *(uint16_t)*: The number of bytes to write.  
 ##### Returns
-I2C I/O status, zero if successful *(uint8_t)*. See the [Arduino Wire.endTransmission() function](http://arduino.cc/en/Reference/WireEndTransmission) for a description of other return codes. Returns a status of EEPROM_ADDR_ERR if the I/O would extend past the top of the EEPROM address space.
+I2C I/O status, zero if successful *(uint8_t)*. See the [Arduino Wire.endTransmission() function](https://www.arduino.cc/reference/en/language/functions/communication/wire/endtransmission/) for a description of other return codes. Returns a status of EEPROM_ADDR_ERR if the I/O would extend past the top of the EEPROM address space.
 ##### Example
 ```c++
 uint8_t myData[10];
@@ -162,7 +162,7 @@ Reads one or more bytes from external EEPROM into an array supplied by the calle
 **values** _(uint8_t*)_: Pointer to an array to receive the data.  
 **nBytes** *(uint16_t)*: The number of bytes to read.  
 ##### Returns
-I2C I/O status, zero if successful *(uint8_t)*. See the [Arduino Wire.endTransmission() function](http://arduino.cc/en/Reference/WireEndTransmission) for a description of other return codes. Returns a status of EEPROM_ADDR_ERR if the I/O would extend past the top of the EEPROM address space.
+I2C I/O status, zero if successful *(uint8_t)*. See the [Arduino Wire.endTransmission() function](https://www.arduino.cc/reference/en/language/functions/communication/wire/endtransmission/) for a description of other return codes. Returns a status of EEPROM_ADDR_ERR if the I/O would extend past the top of the EEPROM address space.
 ##### Example
 ```c++
 uint8_t myData[10];
@@ -186,7 +186,7 @@ Reads a single byte from external EEPROM.
 ##### Parameters
 **addr** *(uint32_t)*: The EEPROM location to read from.
 ##### Returns
-The data read from EEPROM or an error code *(int16_t)*. To distinguish error values from valid data, error values are returned as negative numbers. See the [Arduino Wire.endTransmission() function](http://arduino.cc/en/Reference/WireEndTransmission) for a description of return codes. Returns a status of EEPROM_ADDR_ERR if the I/O would extend past the top of the EEPROM address space.
+The data read from EEPROM or an error code *(int16_t)*. To distinguish error values from valid data, error values are returned as negative numbers. See the [Arduino Wire.endTransmission() function](https://www.arduino.cc/reference/en/language/functions/communication/wire/endtransmission/) for a description of return codes. Returns a status of EEPROM_ADDR_ERR if the I/O would extend past the top of the EEPROM address space.
 
 ##### Example
 ```c++
