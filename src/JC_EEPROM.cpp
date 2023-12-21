@@ -76,7 +76,7 @@ uint8_t JC_EEPROM::write(uint32_t addr, uint8_t* values, uint16_t nBytes)
         Wire.beginTransmission(ctrlByte);
         if (m_nAddrBytes == 2) Wire.write(static_cast<uint8_t>(addr >> 8)); // high addr byte
         Wire.write(static_cast<uint8_t>(addr));                             // low addr byte
-        Wire.write(values, nWrite);
+        Wire.write(values, static_cast<uint8_t>(nWrite));
         txStatus = Wire.endTransmission();
         if (txStatus != 0) return txStatus;
 
@@ -119,7 +119,7 @@ uint8_t JC_EEPROM::read(uint32_t addr, uint8_t* values, uint16_t nBytes)
         uint8_t rxStatus = Wire.endTransmission();
         if (rxStatus != 0) return rxStatus;     // read error
 
-        Wire.requestFrom(ctrlByte, nRead);
+        Wire.requestFrom(ctrlByte, static_cast<uint8_t>(nRead));
         for (byte i=0; i<nRead; i++) values[i] = Wire.read();
 
         addr += nRead;          // increment the EEPROM address
