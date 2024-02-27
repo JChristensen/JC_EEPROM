@@ -27,7 +27,7 @@ The **JC_EEPROM Library** has been tested with:
 - ST Micro M24M02 (2M bit)
 - Atmel AT24C256C (thanks to searobin)
 - Microchip 24C16B, 24C32 (thanks to Diogko)
-- AT24C02 and ESP-12F/ESP8266 (thanks to Thorsten)
+- Microchip AT24C02 and ST Micro M24C04-W with ESP-12F/ESP8266 (thanks to Thorsten)
 
 The **JC_EEPROM Library** will **NOT** work with Microchip 24xx1025 as its control byte does not conform to the following assumptions.
 
