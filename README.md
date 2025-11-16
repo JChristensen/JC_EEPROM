@@ -4,7 +4,7 @@ README file
 
 
 ## License
-Arduino EEPROM Library Copyright (C) 2022 Jack Christensen GNU GPL v3.0
+Arduino EEPROM Library Copyright (C) 2022-2025 Jack Christensen GNU GPL v3.0
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License v3.0 as published by the Free Software Foundation.
 
@@ -90,8 +90,8 @@ Instantiates an external EEPROM object.
 **busAddr** *(uint8_t)*: The base I2C bus address for the EEPROM(s). 0x50 is a common value and this parameter can be omitted, in which case 0x50 will be used as the default.  
 ##### Example
 ```c++
-JC_EEPROM myEEPROM(kbits_256, 2, 64);			//two 24LC256 EEPROMS on the bus
-JC_EEPROM oddEEPROM(kbits_8, 1, 16, 0x42);		//an EEPROM with a non-standard I2C address
+JC_EEPROM myEEPROM(JC_EEPROM::kbits_256, 2, 64);			//two 24LC256 EEPROMS on the bus
+JC_EEPROM oddEEPROM(JC_EEPROM::kbits_8, 1, 16, 0x42);		//an EEPROM with a non-standard I2C address
 ```
 
 ## Methods
@@ -106,7 +106,7 @@ Initializes the library. Call this method once in the setup code. begin() does a
 I2C I/O status, zero if successful *(uint8_t)*. See the [Arduino Wire.endTransmission() function](https://www.arduino.cc/reference/en/language/functions/communication/wire/endtransmission/) for a description of other return codes.
 ##### Example
 ```c++
-JC_EEPROM myEEPROM(kbits_256, 2, 64);
+JC_EEPROM myEEPROM(JC_EEPROM::kbits_256, 2, 64);
 uint8_t i2cStat = myEEPROM.begin(JC_EEPROM::twiClock400kHz);
 if ( i2cStat != 0 ) {
 	//there was a problem
